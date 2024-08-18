@@ -4,7 +4,9 @@
   "description": "Backend Proyecto Final del Bootcamp -  Red Social",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "star": "node index.js",
+    "start:watch": "node --watch index.js"
   },
   "keywords": [
     "PAI_REST",
@@ -16,6 +18,7 @@
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "glob": "^11.0.0",
     "jwt-simple": "^0.5.6",
