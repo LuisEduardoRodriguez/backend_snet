@@ -8,6 +8,7 @@ const secret = 'SECRET_KEY_pRoJeCt_Social_Network_';
 const createToken = (user) => {
    const payload = {
     userId: user._id,
+    name: user.name,
     role: user.role,
     // Fecha de emision
     iat: moment().unix(),
