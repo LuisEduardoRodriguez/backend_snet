@@ -301,10 +301,10 @@ export const uploadAvatar = async (req, res) => {
     const extension = imageSplit[imageSplit.length -1];
 
     // Validar la extensión
-    if(!["png", "jpg", "jpeg", "gif"]){
-      // Borrar archivo subido
-      const filePath = req.file.path;
-      fs.unlinkSync(filePath);
+     if (!["png", "jpg", "jpeg", "gif"].includes(extension.toLowerCase())){
+        //Borrar archivo subido
+        const filePath = req.file.path;
+        fs.unlinkSync(filePath);
 
       return res.status(404).send({
         status: "error",
@@ -340,7 +340,7 @@ export const uploadAvatar = async (req, res) => {
       });
     }
 
-    // Devolver respuesta exitosa 
+    // Devolver respuesta exitosa
     return res.status(200).json({
       status: "success",
       user: userUpdated,
@@ -352,6 +352,36 @@ export const uploadAvatar = async (req, res) => {
     return res.status(500).send({
       status: "error",
       message: "Error al subir archivos"
+    });
+  }
+}
+// Método para mostrar el AVATAR (imagen de perfil)
+export const avatar = async (req, res) => {
+  try {
+    // Obtener el parámetro del archivo desde la url
+    const file = req.params.file;
+
+    // Configurando el path real de la imagen que queremos mostrar
+    const filePath = "./uploads/avatars/" + file;
+
+    // Comprobar que si existe el filePath
+    fs.stat(filePath, (error, exists) => {
+      if(!filePath) {
+        return res.status(404).send({
+          status: "error",
+          message: "No existe la imagen"
+        });
+      }
+
+      // Devolver el file
+      return res.sendFile(path.resolve(filePath));
+    });
+
+  } catch (error) {
+    console.log("Error al mostrar la imagen", error)
+    return res.status(500).send({
+      status: "error",
+      message: "Error al mostrar la imagen"
     });
   }
 }
