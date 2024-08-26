@@ -1,6 +1,9 @@
 import User from "../models/users.js";
 import bcrypt from "bcrypt";
 import { createToken } from "../services/jwt.js";
+import fs from "fs";
+import path from "path";
+
 
 // Método de prueba de usuarios
 export const testUser = (req, res) => {
@@ -276,6 +279,79 @@ export const updateUser = async (req, res) => {
     return res.status(500).send({
       status: "error",
       message: "Error al actualizar el usuario"
+    });
+  }
+}
+// Método para subir AVATAR (imagen de perfil) y actualizar el campo image del User
+export const uploadAvatar = async (req, res) => {
+  try {
+    // Obtener el archivo de la imagen y comprobar si existe
+    if(!req.file){
+      return res.status(404).send({
+        status: "error",
+        message: "Error la petición no incluye la imagen"
+      });
+    }
+
+    // Obtener el nombre del archivo
+    let image = req.file.originalname;
+
+    // Obtener la extensión del archivo
+    const imageSplit = image.split(".");
+    const extension = imageSplit[imageSplit.length -1];
+
+    // Validar la extensión
+    if(!["png", "jpg", "jpeg", "gif"]){
+      // Borrar archivo subido
+      const filePath = req.file.path;
+      fs.unlinkSync(filePath);
+
+      return res.status(404).send({
+        status: "error",
+        message: "Extensión del archivo inválida. Solo se permite: png, jpg, jpeg, gif"
+      });
+    }
+    // Comprobar tamaño del archivo (pj: máximo 1MB)
+    const fileSize = req.file.size;
+    const maxFileSize = 1 * 1024 * 1024; // 1 MB
+
+    if (fileSize > maxFileSize) {
+      const filePath = req.file.path;
+      fs.unlinkSync(filePath);
+
+      return res.status(400).send({
+        status: "error",
+        message: "El tamaño del archivo excede el límite (máx 1 MB)"
+      });
+    }
+
+    // Guardar la imagen en la BD
+    const userUpdated = await User.findOneAndUpdate(
+      {_id: req.user.userId},
+      { image: req.file.filename },
+      { new: true}
+    );
+
+    // verificar si la actualización fue exitosa
+    if (!userUpdated) {
+      return res.status(500).send({
+        status: "error",
+        message: "Eror en la subida de la imagen"
+      });
+    }
+
+    // Devolver respuesta exitosa 
+    return res.status(200).json({
+      status: "success",
+      user: userUpdated,
+      file: req.file
+    });
+
+  } catch (error) {
+    console.log("Error al subir archivos", error)
+    return res.status(500).send({
+      status: "error",
+      message: "Error al subir archivos"
     });
   }
 }
