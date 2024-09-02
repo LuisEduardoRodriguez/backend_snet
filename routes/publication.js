@@ -1,7 +1,6 @@
-// Importaciones
 import { Router } from "express";
 const router = Router();
-import { 
+import {
   testPublication,
   savePublication,
   showPublication,
@@ -41,5 +40,3 @@ router.get('/feed/:page?', ensureAuth, feed);
 
 // Exportar el Router
 export default router;
-
-
